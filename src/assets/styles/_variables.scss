@@ -1,0 +1,61 @@
+// Breakpoints
+$breakpoints: (
+  'xs': 0,
+  'sm': 480px,
+  'md': 768px,
+  'lg': 992px,
+  'xl': 1200px,
+  'xxl': 1440px
+) !default;
+
+// Colors
+$primary:#C00E20;
+$secondary:#ECA539;
+$tertiary:#F22539;
+$disabled:#BFBFBF;
+
+$body-text-primary:#353535;
+$body-text-secondary:#5E5E5E;
+$body-text-tertiary:#BFBFBF;
+$white:#FFFFFF;
+$black:#000000;
+
+$background-light:#F9F9F9;
+$background-lighter:#F5F5F5;
+
+// Spacing
+$spacing-unit: 8px;
+$spacing-double: $spacing-unit * 2;
+$spacing-triple: $spacing-unit * 3;
+$spacing-quadruple: $spacing-unit * 4;
+$spacing-quintuple: $spacing-unit * 5;
+$spacing-sextuple: $spacing-unit * 6;
+$spacing-septuple: $spacing-unit * 7;
+$spacing-octuple: $spacing-unit * 8;
+$spacing-novuple: $spacing-unit * 9;
+$spacing-decuple: $spacing-unit * 10;
+
+// Border Radius
+$border-radius-unit: 4px;
+$border-radius-double: $border-radius-unit * 2;
+$border-radius-triple: $border-radius-unit * 3;
+$border-radius-quadruple: $border-radius-unit * 4;
+$border-radius-quintuple: $border-radius-unit * 5;
+$border-radius-sextuple: $border-radius-unit * 6;
+$border-radius-septuple: $border-radius-unit * 7;
+$border-radius-octuple: $border-radius-unit * 8;
+$border-radius-novuple: $border-radius-unit * 9;
+$border-radius-decuple: $border-radius-unit * 10;
+
+// Tipografía
+$font-family: 'Lato', sans-serif;
+$font-weight-title: 700;
+$font-weight-subtitle: 500;
+$font-weight-text: 400;
+$font-size: 8px;
+$font-size-title: $font-size * 3;
+$font-size-subtitle: $font-size * 2;
+$font-size-text: $font-size * 1;
+$line-height: 150%;
+$letter-spacing: 0;
+$text-align: center;

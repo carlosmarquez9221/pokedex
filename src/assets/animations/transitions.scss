@@ -1,0 +1,21 @@
+@keyframes slide-and-back {
+  0% {
+    transform: translateX(-50px);
+  }
+  50% {
+    transform: translateX(50px);
+  }
+  100% {
+    transform: translateX(-50px);
+  }
+}
+
+.loading-side-to-side {
+  animation: slide-and-back 5s infinite ease-in-out;
+}
+
+.spinner-flip {
+  animation-name: animate__flip;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}

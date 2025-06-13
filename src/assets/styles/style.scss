@@ -1,0 +1,35 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+body {
+  font-family: $font-family!important;
+  margin: 0;
+  padding: 0;
+  background-color: $background-light;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: $font-size-title;
+  font-weight: $font-weight-title;
+  color: $body-text-primary;
+}
+
+p {
+  font-size: $font-size-subtitle;
+  font-weight: $font-weight-text;
+  color: $body-text-secondary;
+  line-height: $line-height;
+  margin: 0;
+}
+
+.mt-2 {
+  margin-top: $spacing-unit * 2;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.v-btn {
+  text-transform: none;
+}

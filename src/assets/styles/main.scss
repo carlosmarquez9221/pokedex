@@ -1,0 +1,6 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+@use './style' as *;
+
+// Importar animaciones
+@import 'animate.css/animate.min.css';
