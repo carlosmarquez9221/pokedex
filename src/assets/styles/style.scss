@@ -1,16 +1,27 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
+
 body {
-  font-family: $font-family!important;
+  font-family: $font-family !important;
   margin: 0;
   padding: 0;
   background-color: $background-light;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-family-title;
   font-size: $font-size-title;
   font-weight: $font-weight-title;
+  line-height: $line-height-title;
+  letter-spacing: $letter-spacing-title;
+  text-align: $text-align-title;
   color: $body-text-primary;
 }
 
