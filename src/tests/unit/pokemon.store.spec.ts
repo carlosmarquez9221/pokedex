@@ -47,12 +47,36 @@ describe('Pokemon Store', () => {
   describe('Actions', () => {
     it('loadPokemons should update state correctly', async () => {
       const store = usePokemonStore();
+      (fetchPokemonDetails as Mock).mockResolvedValue({
+        id: 25,
+        name: 'pikachu',
+        sprites: {
+          front_default: 'pikachu.png',
+          other: {
+            'official-artwork': {
+              front_default: 'pikachu.png'
+            }
+          }
+        },
+        weight: 60,
+        height: 4,
+        types: [
+          { type: { name: 'electric' } }
+        ]
+      });
+
       await store.actions.loadPokemons();
       expect(fetchPokemons).toHaveBeenCalled();
-      expect(store.state.list).toEqual([
-        { ...mockPokemonList[0], isFavorite: false },
-        { ...mockPokemonList[1], isFavorite: false },
-      ]);
+      expect(store.state.list.length).toBe(2);
+      expect(store.state.list[0]).toEqual({
+        id: 25,
+        name: 'pikachu',
+        image: 'pikachu.png',
+        weight: 60,
+        height: 4,
+        types: ['electric'],
+        isFavorite: false,
+      });
       expect(store.state.loading).toBe(false);
     });
 
@@ -84,7 +108,8 @@ describe('Pokemon Store', () => {
         image: 'pikachu.png',
         weight: 60,
         height: 4,
-        types: ['electric']
+        types: ['electric'],
+        isFavorite: false
       });
     });
 
