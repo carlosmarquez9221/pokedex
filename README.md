@@ -1,192 +1,109 @@
-# Pokémon Vue App
+# ⚡ Pokémon Vue App
 
-Una aplicación moderna de Pokémon construida con Vue 3, TypeScript y Vuetify, siguiendo principios de diseño atómico y arquitectura limpia.
+Una aplicación web moderna, intuitiva y responsiva de Pokémon construida con **Vue 3**, **TypeScript**, **Pinia** y **Sass/SCSS**, siguiendo los principios de **Atomic Design** y **Clean Architecture**.
 
-## Tecnologías Principales
+---
 
-- **Vue 3** - Framework progresivo de JavaScript para construir interfaces de usuario
-- **TypeScript** - Tipado estático para mejorar la calidad del código y la experiencia de desarrollo
-- **Vuetify 3** - Biblioteca de componentes Material Design para Vue
-- **Pinia** - Gestor de estado oficial para Vue
-- **Vue Router** - Enrutamiento oficial para aplicaciones Vue
-- **Vue i18n** - Internacionalización
-- **Axios** - Cliente HTTP para consumir APIs
-- **Sass/SCSS** - Preprocesador CSS con metodología BEM
-- **Vitest** - Framework de pruebas unitarias
-- **ESLint** - Linter para mantener la calidad del código
-- **Animate.css** - Para animaciones fluidas
+## 🧠 Arquitectura, Elecciones Tecnológicas y Decisiones de Diseño
 
-## Arquitectura y Estructura
+### 🛠️ Resumen de Tecnologías y Por Qué las Elegimos
 
-### Patrones de Diseño
-- **Atomic Design**: Componentes organizados en átomos, moléculas, organismos, plantillas y páginas
-- **Composition API**: Para una mejor organización y reutilización de la lógica
-- **Patrón Store (Pinia)**: Para la gestión del estado global
-- **Inyección de Dependencias**: Para un mejor acoplamiento entre componentes
+1. **Vue 3 (Composition API & `<script setup>`)**
+   - **Elección:** Utilizado como framework principal de interfaz de usuario.
+   - **Razón:** La Composition API permite una mejor organización de la lógica por funcionalidades, ofrece una inferencia de tipos perfecta con TypeScript y reduce el código repetitivo (*boilerplate*), mejorando el rendimiento de re-renderizado.
 
-### Estructura de Carpetas
+2. **TypeScript (Strict Type System)**
+   - **Elección:** Tipado estático riguroso en toda la aplicación (`PokemonDetails`, `PokemonApiResponse`, etc.).
+   - **Razón:** Elimina errores en tiempo de ejecución, garantiza contratos de datos claros entre la API, los Stores de Pinia y los componentes visuales, y facilita el mantenimiento y refactorización del código a medida que la Pokédex crece.
+
+3. **Pinia (Setup Stores)**
+   - **Elección:** Gestor de estado oficial de Vue utilizando la sintaxis de Setup Store (`defineStore('pokemon', () => { ... })`).
+   - **Razón:** Centraliza el estado global (lista de Pokémon, Pokémon seleccionado, modal y favoritos) en un único punto. Evita el *props drilling* y sincroniza las vistas de forma inmediata.
+
+4. **Sass / SCSS con Metodología BEM**
+   - **Elección:** Preprocesador CSS con arquitectura de estilos modular.
+   - **Razón:** Permite utilizar variables globales, mixins, mapas de tipos/colores de Pokémon y *nesting* ordenado, garantizando que los componentes sean visualmente atractivos, coherentes y altamente adaptables sin depender de frameworks CSS pesados.
+
+5. **Vue i18n**
+   - **Elección:** Sistema de internacionalización multi-idioma (Español / Inglés).
+   - **Razón:** Separa las cadenas de texto del marcado HTML y habilita el cambio dinámico de idioma de forma fluida.
+
+6. **Vitest & Vue Test Utils**
+   - **Elección:** Suite de pruebas unitarias ultrarrápida ejecutada sobre Vite.
+   - **Razón:** Facilita el *mocking* de servicios, stores e i18n, permitiendo validar componentes atómicos y lógica de negocio con ejecución instantánea.
+
+---
+
+## 📊 Pensando en Gran Cantidad de Datos (Estrategia de Escalabilidad)
+
+Aunque una Pokédex sencilla maneja un lote inicial de datos, el diseño de esta solución fue concebido pensando en la **escalabilidad masiva** y el manejo eficiente de **miles de registros**:
+
+### 1. Manejo Eficiente de Peticiones y Concurrencia
+- **Peticiones en Paralelo (`Promise.all`):** Para cargar los detalles de múltiples Pokémon simultáneamente sin crear cuellos de botella secuenciales (*waterfall requests*).
+- **Consolidación de Payload (`PokemonDetails`):** La respuesta de la API original de Pokémon contiene objetos extensos con datos redundantes. Transformamos esta información a un contrato plano y liviano (`PokemonDetails`), reduciendo significativamente la huella en memoria.
+
+### 2. Estructura de Favoritos Optimizada ($O(1)$ Hash Map)
+- En lugar de guardar copias completas de objetos Pokémon en `localStorage` o arreglos pesados, los favoritos se gestionan mediante una tabla hash / diccionario `Record<string, boolean>` (`{ "25": true, "6": true }`).
+- **Ventaja:** Búsquedas, inserciones y eliminaciones en tiempo constante $O(1)$, reduciendo el consumo de memoria en disco de megabytes a solo unos pocos bytes.
+
+### 3. Filtrado y Ordenamiento Reactivo en Memoria
+- El filtrado por búsqueda (nombre o ID), tipo (Planta, Fuego, Agua, etc.) y ordenamiento se realiza mediante **propiedades computadas (`computed`)** sobre la lista en el Store. Esto evita mutar el estado original y previene solicitudes HTTP innecesarias al servidor cuando el usuario navega entre filtros.
+
+### 4. Hoja de Ruta para Datasets Masivos (Futuras Mejoras de Performance)
+Para escalar a la totalidad de la Pokédex (+1000 Pokémon y múltiples regiones):
+- **Virtual Scrolling (`v-virtual-scroll` / `vue-virtual-scroller`):** Renderizar en el DOM únicamente los ítems visibles en el viewport (manteniendo el número de nodos DOM constante en $O(1)$).
+- **Debounce en Búsqueda:** Aplicar un *debounce* de 300ms en el `SearchBar` para minimizar los re-cálculos de filtrado durante el tipeo rápido.
+- **Caché en Memoria e IndexedDB:** Almacenar en caché local los Pokémon ya consultados para evitar peticiones repetidas a la API.
+
+---
+
+## 🎨 Arquitectura de Componentes (Atomic Design)
+
+La interfaz se organiza bajo la metodología de **Atomic Design**:
+
 ```
 src/
-├── assets/          # Recursos estáticos (imágenes, fuentes, etc.)
-├── components/      # Componentes reutilizables
-│   ├── atoms/      # Componentes atómicos (botones, inputs, etc.)
-│   ├── molecules/  # Componentes moleculares (combinación de átomos)
-│   └── organisms/  # Componentes complejos (combinación de moléculas)
-├── composables/    # Lógica reutilizable (hooks personalizados)
-├── locales/        # Archivos de internacionalización
-├── router/         # Configuración de rutas
-├── services/       # Servicios API y lógica de negocio
-├── stores/         # Stores de Pinia
-├── styles/         # Estilos globales y tokens de diseño
-├── types/          # Tipos de TypeScript
-└── views/          # Vistas/páginas de la aplicación
+├── assets/          # Imágenes, íconos y assets globales
+├── components/
+│   ├── atoms/       # AppButton, AppCard, etc.
+│   ├── molecules/   # PokemonGrid, PokemonFilter, SearchBar, PokemonModal, ViewToggle
+│   └── organisms/   # PokemonCatalogContainer
+├── locales/         # Diccionarios i18n (es.ts, en.ts)
+├── services/        # Consumo de API (pokemon.api.ts) y Tipos (pokemon.d.ts)
+├── stores/          # Store de Pinia (pokemon.store.ts)
+├── styles/          # Variables SCSS, mixins y temas
+├── tests/           # Pruebas unitarias con Vitest
+└── views/           # Vistas principales (PokemonCatalogView.vue)
 ```
 
-## Guía de Estilos
+---
 
-### Metodología BEM
-```scss
-.block {
-  &__element {}
-  &--modifier {}
-}
-```
+## ✨ Novedades y Mejoras Recientes
 
-### Breakpoints
-- `xs`: 0px - 599px
-- `sm`: 600px - 959px
-- `md`: 960px - 1263px
-- `lg`: 1264px - 1903px
-- `xl`: 1904px en adelante
+- **Tipado Robustecido:** Extensión de la interfaz `PokemonDetails` (`ability`, `category`, `description`, `genderRate`) corrigiendo errores de TypeScript por propiedades no conocidas.
+- **Modal de Detalle (`PokemonModal`):**
+  - Botón de retroceso/cierre con flecha (`fa-arrow-left`).
+  - Botón de favorito interactivo con icono de corazón (`fa-solid fa-heart` / `fa-regular fa-heart`) y destacado en rojo brillante cuando está activo.
+  - Sincronización directa del evento `@toggle-favorite` con el Store global de Pinia.
+- **Cobertura de Pruebas Unitarias:** Pruebas unitarias de componentes y tiendas actualizadas y ejecutándose exitosamente con Vitest.
 
-### Tokens de Diseño
-- Colores primarios, secundarios y de estado
-- Espaciado y tipografía consistente
-- Sombras y bordes estandarizados
+---
 
-## Gestión de Estado con Pinia
-
-### Estructura del Store
-```typescript
-// stores/pokemon.ts
-export const usePokemonStore = defineStore('pokemon', {
-  state: () => ({
-    pokemonList: [],
-    isLoading: false,
-    isModalOpen: false,
-    selectedPokemon: null
-  }),
-
-  actions: {
-    async fetchPokemons() { /* ... */ },
-    openModal(pokemon) { /* ... */ },
-    closeModal() { /* ... */ }
-  }
-});
-```
-
-### ¿Por qué usar el store para el estado del modal y loading?
-1. **Estado Global**: El estado del modal y el loading puede ser necesario en múltiples componentes.
-2. **Sincronización**: Garantiza que todos los componentes vean el mismo estado.
-3. **Mantenibilidad**: Centraliza la lógica relacionada con estos estados.
-4. **Prevención de Props Drilling**: Evita pasar props a través de múltiples niveles de componentes.
-
-## Optimizaciones de Rendimiento
-
-### Lazy Loading
-- Carga perezosa de rutas
-- Componentes dinámicos con `defineAsyncComponent`
-- Imágenes optimizadas con WebP y atributos `srcset`
-
-### Optimización de Imágenes
-```vue
-<picture>
-  <source
-    :srcset="`/images/pokemon/${id}.webp`"
-    type="image/webp"
-  >
-  <img
-    :src="`/images/pokemon/${id}.png`"
-    :alt="`${name} sprite`"
-    loading="lazy"
-  >
-</picture>
-```
-
-## Testing
-
-### Estrategia de Pruebas
-- **Unit Tests**: Pruebas de componentes con Vitest y Vue Test Utils
-- **Mocks**: Simulación de llamadas API
-- **Test Coverage**: Cobertura de código superior al 80%
-
-## Responsive Design
-- Enfoque Mobile-First
-- Grid System de Vuetify
-- Imágenes y tipografía responsivas
-- Menú de navegación adaptable
-
-## Internacionalización
-- Soporte para múltiples idiomas
-- Archivos de traducción organizados por módulo
-- Cambio dinámico de idioma
-
-## Scripts Disponibles
+## 🚀 Comandos y Scripts Disponibles
 
 ```bash
 # Instalar dependencias
 npm install
 
-# Servidor de desarrollo
+# Iniciar servidor de desarrollo
 npm run dev
 
-# Compilar para producción
+# Ejecutar pruebas unitarias (Vitest)
+npm test
+
+# Compilar para producción (con verificación de tipos vue-tsc)
 npm run build
 
-# Ejecutar pruebas unitarias
-npm run test:unit
-
-# Linter
-npm run lint
+# Vista previa de la compilación de producción
+npm run preview
 ```
-
-## Despliegue
-
-La aplicación está configurada para desplegarse en cualquier servicio de hosting estático como:
-- Vercel
-- Netlify
-- GitHub Pages
-- Firebase Hosting
-
-## Oportunidades de Mejora
-
-### Componentes
-- **PokemonList**: Implementar virtual scrolling para listas largas
-- **PokemonCard**: Mejorar accesibilidad con ARIA labels
-- **PokemonModal**: Añadir transiciones más suaves
-- **SearchBar**: Añadir debounce para búsquedas
-
-### Estado Global
-- Implementar persistencia del estado
-- Mejorar manejo de errores
-- Añadir caché para peticiones API
-
-### Rendimiento
-- Implementar Service Workers para modo offline
-- Añadir skeleton loaders
-- Optimizar bundle size con code splitting
-
-### Testing
-- Añadir pruebas de integración
-- Implementar pruebas E2E con Cypress
-- Aumentar cobertura de pruebas
-
-## ¿Por qué no usar componibles?
-
-Los **componibles** son funciones reutilizables que utilizan la Composition API de Vue para encapsular y reutilizar lógica con estado. Aunque son poderosos, en este proyecto opté por:
-
-1. **Simplicidad**: Para mantener el código más directo y fácil de seguir
-2. **Alcance del Proyecto**: La aplicación es lo suficientemente pequeña como para no necesitar extraer lógica compleja
-3. **Familiaridad**: Para desarrolladores que puedan estar más familiarizados con la Options API
-
-Sin embargo, en proyectos más grandes o con lógica más compleja, los componibles serían una excelente opción para extraer y reutilizar lógica entre componentes.
