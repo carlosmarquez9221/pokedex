@@ -1,85 +1,117 @@
 <script setup lang="ts">
-  import { ref, watch, defineProps, defineEmits } from 'vue';
+  import { ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import AppButton from '@/components/atoms/AppButton.vue';
+
+  type NavValue = 'pokedex' | 'regions' | 'favorites' | 'profile';
+
+  const props = withDefaults(
+    defineProps<{
+      modelValue?: NavValue;
+    }>(),
+    {
+      modelValue: 'pokedex',
+    }
+  );
+
+  const emit = defineEmits<{
+    (e: 'update:modelValue', value: NavValue): void;
+  }>();
 
   const { t } = useI18n();
 
-  const props = defineProps<{
-    modelValue: 'all' | 'favorites';
-  }>();
-
-  const emit = defineEmits<{
-    (e: 'update:modelValue', value: 'all' | 'favorites'): void;
-  }>();
-
-  const localValue = ref<'all' | 'favorites'>(props.modelValue);
+  const navItems: { value: NavValue; icon: string; label: string }[] = [
+    { value: 'pokedex', icon: 'fa-solid fa-house', label: t('nav.pokedex') },
+    { value: 'regions', icon: 'fa-solid fa-globe', label: t('nav.regions') },
+    { value: 'favorites', icon: 'fa-solid fa-heart', label: t('nav.favorites') },
+    { value: 'profile', icon: 'fa-solid fa-user', label: t('nav.profile') },
+  ];
+  
+  const localValue = ref<NavValue>(props.modelValue);
 
   watch(localValue, (newValue) => {
     emit('update:modelValue', newValue);
   });
 
-  watch(() => props.modelValue, (newValue) => {
-    if (newValue !== localValue.value) {
-      localValue.value = newValue;
+  watch(
+    () => props.modelValue,
+    (newValue) => {
+      if (newValue !== localValue.value) {
+        localValue.value = newValue;
+      }
     }
-  });
+  );
 </script>
 
 <template>
-  <div class="view-toggle-container">
-    <AppButton
-      variant="disabled"
-      :class="{ 'active-toggle': localValue === 'all' }"
-      @click="localValue = 'all'"
-    >
-      <i class="fa-solid fa-list"></i>
-      <span class="d-none d-sm-inline">{{ t('viewToggle.all') }}</span>
-    </AppButton>
-
-    <AppButton
-      variant="disabled"
-      :class="{ 'active-toggle': localValue === 'favorites' }"
-      @click="localValue = 'favorites'"
-    >
-      <i class="fa-solid fa-star"></i>
-      <span class="d-none d-sm-inline">{{ t('viewToggle.favorites') }}</span>
-    </AppButton>
-  </div>
+  <v-footer class="responsive-footer d-flex align-center justify-center py-2 px-2" color="white">
+    <v-row no-gutters justify="center" align="center" class="w-100 max-width-container">
+      <v-col
+        v-for="item in navItems"
+        :key="item.value"
+        cols="3"
+        class="d-flex justify-center"
+      >
+        <button
+          type="button"
+          class="nav-item"
+          :class="{ 'nav-item--active': localValue === item.value }"
+          @click="localValue = item.value"
+        >
+          <i :class="item.icon" class="nav-item-icon"></i>
+          <span class="nav-item-label">{{ item.label }}</span>
+        </button>
+      </v-col>
+    </v-row>
+  </v-footer>
 </template>
 
 <style scoped lang="scss">
-.view-toggle-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  background: $white;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
+  .responsive-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+    background: #ffffff !important;
+  }
 
-:deep(.v-btn) {
-  &.active-toggle {
-    background-color: $primary !important;
-    color: $white !important;
-    opacity: 1 !important;
-    border-color: $primary !important;
+  .max-width-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
 
-    .v-btn__overlay {
-      opacity: 0 !important;
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px;
+    color: #424242;
+    transition: color 0.2s ease;
+
+    .nav-item-icon {
+      font-size: 1.1rem;
+    }
+
+    .nav-item-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    &--active {
+      color: #1565C0;
+
+      .nav-item-label {
+        font-weight: 700;
+      }
     }
   }
-
-  &.v-btn--disabled {
-    background-color: $disabled !important;
-    color: $white !important;
-    opacity: 1 !important;
-    border: 1px solid $disabled !important;
-  }
-}
 </style>

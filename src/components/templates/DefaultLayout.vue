@@ -1,5 +1,11 @@
+<script setup lang="ts">
+  defineProps<{
+    alignTop?: boolean;
+  }>();
+</script>
+
 <template>
-  <div class="layout">
+  <div class="layout" :class="{ 'layout--top': alignTop }">
     <main class="layout__main">
       <slot />
     </main>
@@ -15,6 +21,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    &.layout--top {
+      justify-content: flex-start;
+    }
 
     &__main {
       width: 100%;

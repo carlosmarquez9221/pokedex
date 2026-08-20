@@ -16,10 +16,10 @@
 <style scoped lang="scss">
   .custom-card {
     width: 100%;
-    height: 60px;
+    min-height: 60px;
     border-radius: $border-radius-unit;
     background-color: $white;
-    margin: $spacing-double 0px;
+    margin: 0;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
@@ -28,12 +28,11 @@
     border: 1px solid #e0e0e0;
 
     &:hover {
-      background-color: #f8f9fa;
+      filter: brightness(0.97);
     }
 
     &:active {
       transform: scale(0.98);
-      background-color: #f1f3f5;
     }
 
     .card-content {
@@ -41,7 +40,7 @@
       justify-content: space-between;
       align-items: center;
       height: 100%;
-      padding: 0 16px;
+      width: 100%;
     }
   }
 </style>

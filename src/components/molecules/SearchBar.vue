@@ -9,10 +9,18 @@
     placeholder: {
       type: String,
       default: 'Search'
+    },
+    showFilter: {
+      type: Boolean,
+      default: true
+    },
+    isFilterActive: {
+      type: Boolean,
+      default: false
     }
   });
 
-  const emit = defineEmits(['update:modelValue', 'search']);
+  const emit = defineEmits(['update:modelValue', 'search', 'toggle-filter']);
 
   const searchQuery = ref(props.modelValue);
 
@@ -31,6 +39,10 @@
     emit('update:modelValue', '');
     emit('search', '');
   };
+
+  const onToggleFilter = () => {
+    emit('toggle-filter');
+  };
 </script>
 
 <template>
@@ -45,8 +57,19 @@
         @input="onSearch"
         @keyup.enter="onSearch"
       />
-      <button v-if="searchQuery" @click="clearSearch" class="clear-button">
+      <button v-if="searchQuery" type="button" @click="clearSearch" class="clear-button" aria-label="Limpiar búsqueda">
         <i class="fas fa-times"></i>
+      </button>
+
+      <button
+        v-if="showFilter"
+        type="button"
+        class="filter-button"
+        :class="{ 'filter-button--active': isFilterActive }"
+        @click="onToggleFilter"
+        aria-label="Filtros"
+      >
+        <i class="fa-solid fa-sliders"></i>
       </button>
     </div>
   </div>
@@ -54,17 +77,23 @@
 
 <style scoped lang="scss">
 .search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
   margin: 0 auto;
 }
 
 .search-input-container {
-  position: relative;
   display: flex;
   align-items: center;
-  background-color: $background-light;
-  border-radius: $border-radius-unit;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: $spacing-unit;
+  border-radius: 30px;
+  border: 1.5px solid rgba(224, 224, 224, 1);
+  padding: 6px 16px;
+  margin-bottom: 16px;
+  gap: 8px;
+  background-color: #ffffff;
 }
 
 .search-icon {
@@ -80,30 +109,35 @@
   outline: none;
   font-size: 14px;
   color: $body-text-primary;
-  padding: $spacing-unit;
+  padding: 8px $spacing-unit;
 
   &::placeholder {
     color: $body-text-tertiary;
   }
 }
 
-.clear-button {
+.clear-button, .filter-button {
   background: none;
   border: none;
   color: $body-text-tertiary;
   cursor: pointer;
-  padding: $spacing-unit;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    color: $body-text-secondary;
+    color: #6C5CE7;
+    transform: scale(1.1);
   }
 
   i {
     font-size: 16px;
   }
+}
+
+.filter-button--active {
+  color: #6C5CE7;
 }
 </style>

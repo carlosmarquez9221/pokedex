@@ -10,7 +10,6 @@
 
 <template>
   <v-btn
-    :color="variant"
     :class="['app-button', `app-button--${variant}`]"
     @click="(event: MouseEvent) => emit('click', event)"
   >
@@ -20,40 +19,62 @@
 
 <style scoped lang="scss">
   .app-button {
+    :deep(.v-btn__overlay),
+    :deep(.v-btn__underlay) {
+      opacity: 0 !important;
+    }
+
     @mixin button-base {
-      width: auto;
-      height: 44px;
-      font-family: $font-family;
-      font-size: $font-size-subtitle;
-      font-weight: $font-weight-title;
-      line-height: $line-height;
-      letter-spacing: $letter-spacing;
-      padding: 11px 20px;
-      border-radius: 60px;
-      gap: 10px;
-      color: $white;
-      border: none;
+      width: 100%;
+      max-width: 328px !important;
+      height: 58px !important;
+      font-family: $font-family-button !important;
+      font-size: $font-size-button !important;
+      font-weight: $font-weight-button !important;
+      line-height: $line-height-button !important;
+      letter-spacing: $letter-spacing-button !important;
+      text-align: $text-align-button !important;
+      padding: 16px 24px !important;
+      border-radius: 100px !important;
+      gap: 8px;
+      opacity: 1;
+      color: $white !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
       cursor: pointer;
     }
 
     &--primary {
       @include button-base;
-      background: $primary;
+      &, &:focus, &:active, &.v-btn--focused, &.v-btn--active {
+        background-color: $primary !important;
+        color: $white !important;
+      }
     }
 
     &--secondary {
       @include button-base;
-      background: $secondary;
+      &, &:focus, &:active, &.v-btn--focused, &.v-btn--active {
+        background-color: $secondary !important;
+        color: $white !important;
+      }
     }
 
     &--tertiary {
       @include button-base;
-      background: $tertiary;
+      &, &:focus, &:active, &.v-btn--focused, &.v-btn--active {
+        background-color: $tertiary !important;
+        color: $white !important;
+      }
     }
 
     &--disabled {
       @include button-base;
-      background: $disabled;
+      &, &:focus, &:active, &.v-btn--focused, &.v-btn--active {
+        background-color: $disabled !important;
+        color: $white !important;
+      }
     }
   }
 </style>
