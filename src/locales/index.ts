@@ -13,15 +13,15 @@ type MessageSchema = {
   };
 };
 
-const getBrowserLanguage = (): 'es' | 'en' => {
-  const browserLang = navigator.language || 'es';
-  return browserLang.startsWith('es') ? 'es' : 'en';
-};
+// const getBrowserLanguage = (): 'es' | 'en' => {
+//   const browserLang = navigator.language || 'es';
+//   return browserLang.startsWith('es') ? 'es' : 'en';
+// };
 
 const i18n = createI18n<[MessageSchema], 'es' | 'en'>({
   legacy: false,
-  locale: getBrowserLanguage(),
-  fallbackLocale: 'en',
+  locale: 'es',
+  fallbackLocale: 'es',
   messages: { en, es },
 });
 

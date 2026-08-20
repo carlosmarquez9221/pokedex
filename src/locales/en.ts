@@ -1,7 +1,7 @@
 export default {
   app: {
-    title: "Welcome to Pokédex",
-    description: "The digital encyclopedia created by Professor Oak is an invaluable tool to Trainers in the Pokémon world.",
+    title: "All Pokémon in one place",
+    description: "Access a wide list of Pokémon from all generations created by Nintendo.",
   },
   pokemon: {
     name: "Name",
