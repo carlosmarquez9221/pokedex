@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PokemonDetails } from '@/services/types/pokemon.d';
+import AppButton from '@/components/atoms/AppButton.vue';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -14,6 +15,9 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+
+const isCopied = ref(false);
+let copiedTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const TYPE_META: Record<string, { label: string; color: string; icon: string }> = {
   normal:   { label: 'Normal',   color: '#A8A878', icon: 'fa-circle' },
@@ -122,6 +126,53 @@ const closeModal = () => emit('close');
 const toggleFavorite = () => {
   if (props.pokemon) emit('toggle-favorite', props.pokemon.id);
 };
+
+const sharePokemon = async () => {
+  if (!props.pokemon) return;
+
+  const attributes: string[] = [displayName.value || props.pokemon.name];
+
+  if (props.pokemon.types && props.pokemon.types.length) {
+    attributes.push(...props.pokemon.types);
+  }
+  if (formattedWeight.value) {
+    attributes.push(formattedWeight.value);
+  }
+  if (formattedHeight.value) {
+    attributes.push(formattedHeight.value);
+  }
+  if (props.pokemon.category) {
+    attributes.push(props.pokemon.category);
+  }
+  if (props.pokemon.ability) {
+    attributes.push(props.pokemon.ability);
+  }
+
+  const shareText = attributes.filter(Boolean).join(', ');
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(shareText);
+    } else {
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+
+    isCopied.value = true;
+    if (copiedTimeout) clearTimeout(copiedTimeout);
+    copiedTimeout = setTimeout(() => {
+      isCopied.value = false;
+    }, 5000);
+  } catch (err) {
+    console.error('Error al copiar en el portapapeles:', err);
+  }
+};
 </script>
 
 <template>
@@ -137,15 +188,17 @@ const toggleFavorite = () => {
           <i class="fa-solid fa-arrow-left"></i>
         </button>
 
-        <button
-          class="icon-btn favorite-btn"
-          :class="{ active: pokemon.isFavorite }"
-          type="button"
-          @click="toggleFavorite"
-          :aria-label="pokemon.isFavorite ? t('pokemon.removeFavorite') : t('pokemon.addFavorite')"
-        >
-          <i :class="pokemon.isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
-        </button>
+        <div class="header-actions">
+          <button
+            class="icon-btn favorite-btn"
+            :class="{ active: pokemon.isFavorite }"
+            type="button"
+            @click="toggleFavorite"
+            :aria-label="pokemon.isFavorite ? t('pokemon.removeFavorite') : t('pokemon.addFavorite')"
+          >
+            <i :class="pokemon.isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+          </button>
+        </div>
       </header>
 
       <div class="hero" :style="heroBackground">
@@ -210,6 +263,13 @@ const toggleFavorite = () => {
             </span>
           </div>
         </div>
+
+        <div class="modal-footer">
+          <AppButton variant="primary" class="share-button" @click="sharePokemon">
+            <i :class="isCopied ? 'fa-solid fa-check' : 'fa-solid fa-share-nodes'"></i>
+            {{ isCopied ? t('pokemon.copied') : t('pokemon.share') }}
+          </AppButton>
+        </div>
       </div>
     </div>
   </div>
@@ -246,6 +306,12 @@ const toggleFavorite = () => {
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .icon-btn {
@@ -431,5 +497,18 @@ const toggleFavorite = () => {
   margin-top: 6px;
   font-size: 13px;
   color: #4b5563;
+}
+
+.modal-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+
+  .share-button {
+    width: 100%;
+    i {
+      margin-right: 4px;
+    }
+  }
 }
 </style>

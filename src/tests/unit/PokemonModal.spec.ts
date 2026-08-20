@@ -92,4 +92,29 @@ describe('PokemonModal', () => {
     expect(wrapper.emitted('toggle-favorite')).toBeTruthy();
     expect(wrapper.emitted('toggle-favorite')![0]).toEqual([mockPokemon.id]);
   });
+
+  it('copies pokemon name and attributes separated by comma to clipboard when share button is clicked', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: writeTextMock,
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    const wrapper = mount(PokemonModal, {
+      props: {
+        isOpen: true,
+        pokemon: mockPokemon,
+      },
+    });
+
+    const shareBtn = wrapper.find('.share-btn');
+    expect(shareBtn.exists()).toBe(true);
+
+    await shareBtn.trigger('click');
+
+    expect(writeTextMock).toHaveBeenCalledWith('Pikachu, electric, 6,0 kg, 0,4 m');
+  });
 });
