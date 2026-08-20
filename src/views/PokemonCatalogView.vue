@@ -1,19 +1,24 @@
 <script setup lang="ts">
-  import { defineAsyncComponent } from 'vue';
+  // Stores
   import { usePokemonStore } from '@/stores/pokemon.store';
 
-  const pokemonStore = usePokemonStore();
+  // Components
+  import PokemonCatalogContainer from '@/components/organisms/PokemonCatalogContainer.vue';
+  import PokemonModal from '@/components/molecules/PokemonModal.vue';
 
-  const PokemonCatalogContainer = defineAsyncComponent(() => import('@/components/organisms/PokemonCatalogContainer.vue'));
-  const PokemonModal = defineAsyncComponent(() => import('@/components/molecules/PokemonModal.vue'));
+  const pokemonStore = usePokemonStore();
 </script>
 
 <template>
-  <PokemonCatalogContainer />
+  <div class="pokemon-catalog-view">
+    <PokemonCatalogContainer />
 
-  <PokemonModal
-    :isOpen="pokemonStore.state.isModalOpen"
-    :pokemon="pokemonStore.state.currentPokemon"
-    @close="pokemonStore.actions.closeModal"
-  />
+    <PokemonModal
+      v-if="pokemonStore.state.currentPokemon"
+      :isOpen="pokemonStore.state.isModalOpen"
+      :pokemon="pokemonStore.state.currentPokemon"
+      @close="pokemonStore.actions.closeModal"
+      @toggle-favorite="pokemonStore.actions.toggleFavorite"
+    />
+  </div>
 </template>
